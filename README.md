@@ -21,9 +21,10 @@ Boilerplate Next.js (App Router) fullstack, prêt à l'emploi pour démarrer un 
 ## Démarrage rapide
 
 ```bash
-# 1. Cloner le repo
-git clone https://github.com/bobywan/boby-boilerplate.git mon-projet
+# 1. Créer le projet depuis le boilerplate (sans historique git)
+npx degit bobywan/boby-boilerplate mon-projet
 cd mon-projet
+git init
 
 # 2. Utiliser la bonne version de Node (nvm ou fnm)
 nvm use   # ou: fnm use
@@ -31,26 +32,64 @@ nvm use   # ou: fnm use
 # 3. Installer les dépendances
 npm install
 
-# 4. Copier les variables d'environnement
+# 4. Initialiser le projet (renomme le workspace, met à jour package.json)
+npm run init-project
+
+# 5. Copier les variables d'environnement
 cp .env.example .env.local
 
-# 5. Lancer le serveur de développement
+# 6. Lancer le serveur de développement
 npm run dev
 ```
 
 L'application sera disponible sur [http://localhost:3000](http://localhost:3000).
 
+## Mise à jour depuis le boilerplate
+
+### Projet qui utilise déjà le boilerplate
+
+```bash
+npm run sync
+```
+
+### Projet existant sans le boilerplate (première fois)
+
+Copie le script de sync dans le projet, puis lance-le :
+
+```bash
+mkdir -p scripts \
+  && curl -fsSL https://raw.githubusercontent.com/bobywan/boby-boilerplate/main/scripts/sync-boilerplate.sh \
+     -o scripts/sync-boilerplate.sh \
+  && chmod +x scripts/sync-boilerplate.sh \
+  && ./scripts/sync-boilerplate.sh
+```
+
+---
+
+Le script télécharge uniquement les fichiers "infrastructure" depuis la branche `main` du boilerplate. Le code applicatif (`app/`, `next.config.ts`, `package.json`, `.env.example`, `README.md`) n'est jamais écrasé.
+
+Pour pointer vers une autre branche :
+
+```bash
+BRANCH=feat/xxx npm run sync
+```
+
+> Après une sync, inspecte les changements avec `git diff` avant de commiter.
+
 ## Scripts disponibles
 
-| Commande        | Description                              |
-| --------------- | ---------------------------------------- |
-| `npm run dev`   | Lance le serveur de dev avec message de démarrage |
-| `npm run build` | Build de production                      |
-| `npm run start` | Démarre le serveur de production         |
-| `npm run lint`  | Analyse le code avec Biome               |
-| `npm run format`| Formate le code avec Biome               |
-| `npm run check` | Lint + format + imports en une commande  |
-| `npm run ci`    | Vérification CI (lecture seule)          |
+| Commande             | Description                              |
+| -------------------- | ---------------------------------------- |
+| `npm run dev`        | Lance le serveur de dev avec message de démarrage |
+| `npm run build`      | Build de production                      |
+| `npm run start`      | Démarre le serveur de production         |
+| `npm run init-project` | Renomme le workspace et met à jour package.json |
+| `npm run typecheck`  | Vérifie les types TypeScript             |
+| `npm run sync`       | Synchronise les configs depuis le boilerplate |
+| `npm run lint`       | Analyse le code avec Biome               |
+| `npm run format`     | Formate le code avec Biome               |
+| `npm run check`      | Lint + format + imports en une commande  |
+| `npm run ci`         | Vérification CI (lecture seule)          |
 
 ## Structure du projet
 
@@ -59,11 +98,16 @@ L'application sera disponible sur [http://localhost:3000](http://localhost:3000)
 ├── .github/workflows/ci.yml   # GitHub Actions CI
 ├── .vscode/                   # Config VSCode / Cursor
 ├── app/                       # App Router Next.js
+│   ├── error.tsx
 │   ├── layout.tsx
+│   ├── loading.tsx
+│   ├── not-found.tsx
 │   └── page.tsx
 ├── public/                    # Assets statiques
 ├── scripts/
-│   └── dev-start.mjs          # Message de démarrage
+│   ├── dev-start.mjs          # Message de démarrage
+│   ├── init-project.sh        # Initialisation d'un nouveau projet
+│   └── sync-boilerplate.sh    # Synchronisation depuis le boilerplate
 ├── .env.example               # Variables d'env (template)
 ├── .nvmrc                     # Node 24 LTS
 ├── biome.json                 # Config Biome (lint + format)

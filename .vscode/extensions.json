@@ -2,7 +2,6 @@
   "recommendations": [
     "biomejs.biome",
     "bradlc.vscode-tailwindcss",
-    "prisma.prisma",
     "ms-vscode.vscode-typescript-next"
   ]
 }

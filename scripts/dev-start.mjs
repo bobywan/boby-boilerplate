@@ -1,4 +1,4 @@
-import { execSync } from "node:child_process";
+import { spawn } from "node:child_process";
 import { readFileSync } from "node:fs";
 
 const pkg = JSON.parse(readFileSync(new URL("../package.json", import.meta.url)));
@@ -27,4 +27,9 @@ console.log("");
 console.log(`  ${yellow}▶ Starting dev server…${reset}`);
 console.log("");
 
-execSync("next dev", { stdio: "inherit" });
+const child = spawn("next", ["dev"], { stdio: "inherit" });
+
+process.on("SIGINT", () => child.kill("SIGINT"));
+process.on("SIGTERM", () => child.kill("SIGTERM"));
+
+child.on("exit", (code) => process.exit(code ?? 0));

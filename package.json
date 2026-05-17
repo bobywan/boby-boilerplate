@@ -9,6 +9,9 @@
     "dev": "node scripts/dev-start.mjs",
     "build": "next build",
     "start": "next start",
+    "init-project": "bash scripts/init-project.sh",
+    "typecheck": "tsc --noEmit",
+    "sync": "bash scripts/sync-boilerplate.sh",
     "lint": "biome lint .",
     "format": "biome format --write .",
     "check": "biome check --write .",
@@ -23,7 +26,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^2.4.15",
-    "@types/node": "^20",
+    "@types/node": "^24",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "typescript": "^5"
