@@ -91,6 +91,9 @@ main() {
     errors=$((errors + 1))
   fi
 
+  # Merge du .gitignore
+  sync_gitignore "$BASE_URL" "$green" "$red" "$reset" "$dim" || errors=$((errors + 1))
+
   echo ""
 
   # Merge des scripts boilerplate dans package.json local
@@ -122,6 +125,44 @@ EOF
   fi
 
   echo ""
+}
+
+sync_gitignore() {
+  local remote_url="$1" green="$2" red="$3" reset="$4" dim="$5"
+  local tmp_remote
+  tmp_remote="$(mktemp)"
+
+  if ! curl -fsSL "${remote_url}/.gitignore" -o "$tmp_remote" 2>/dev/null; then
+    echo -e "  ${red}✗${reset} .gitignore ${dim}(erreur de téléchargement)${dim}"
+    rm -f "$tmp_remote"
+    return 1
+  fi
+
+  if [ ! -f ".gitignore" ]; then
+    cp "$tmp_remote" .gitignore
+    echo -e "  ${green}✓${reset} .gitignore (créé)"
+    rm -f "$tmp_remote"
+    return 0
+  fi
+
+  local added=0
+  local new_lines=""
+  while IFS= read -r line; do
+    [[ -z "$line" || "$line" == \#* ]] && continue
+    if ! grep -qxF "$line" .gitignore; then
+      new_lines+="${line}"$'\n'
+      added=$((added + 1))
+    fi
+  done < "$tmp_remote"
+
+  if [ "$added" -gt 0 ]; then
+    printf '\n# synced from boilerplate\n%s' "$new_lines" >> .gitignore
+    echo -e "  ${green}✓${reset} .gitignore (${added} ligne(s) ajoutée(s))"
+  else
+    echo -e "  ${green}✓${reset} .gitignore (déjà à jour)"
+  fi
+
+  rm -f "$tmp_remote"
 }
 
 main "$@"
