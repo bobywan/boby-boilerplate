@@ -126,6 +126,25 @@ cp .env.example .env.local
 
 > Les fichiers `.env*` sont ignorés par git (sauf `.env.example`).
 
+## Headroom — compression de contexte IA
+
+Ce boilerplate embarque une configuration [Headroom](https://github.com/chopratejas/headroom) dans `.cursor/mcp.json`. Headroom est un serveur MCP qui compresse automatiquement le contexte envoyé aux LLMs (60–95% de tokens économisés).
+
+**Prérequis machine (une seule fois) :**
+
+```bash
+# Python 3.10+ requis
+pip install "headroom-ai[mcp]"
+```
+
+**Vérifier que Cursor détecte le serveur :**
+
+```bash
+headroom mcp status
+```
+
+Une fois installé, les agents Cursor travaillant sur ce projet ont automatiquement accès aux outils `headroom_compress`, `headroom_retrieve` et `headroom_stats`.
+
 ## Licence
 
 MIT
