@@ -126,24 +126,87 @@ cp .env.example .env.local
 
 > Les fichiers `.env*` sont ignorés par git (sauf `.env.example`).
 
-## Headroom — compression de contexte IA
+## AI Development Environment
 
-Ce boilerplate embarque une configuration [Headroom](https://github.com/chopratejas/headroom) dans `.cursor/mcp.json`. Headroom est un serveur MCP qui compresse automatiquement le contexte envoyé aux LLMs (60–95% de tokens économisés).
+Ce boilerplate embarque un environnement de développement IA complet, optimisé pour Cursor + Claude Sonnet.
 
-**Prérequis machine (une seule fois) :**
+### Outils configurés
+
+| Outil | Rôle | Installation |
+|-------|------|-------------|
+| [Context Mode](https://github.com/mksglu/context-mode) | Serveur MCP — protection de la fenêtre de contexte, session persistante SQLite/FTS5 | `npm install -g context-mode` |
+| [Headroom](https://github.com/chopratejas/headroom) | Serveur MCP — compression de contexte (60–95% de tokens économisés) | `pip install "headroom-ai[mcp]"` |
+| [Serena](https://github.com/oraios/serena) | Serveur MCP — navigation symbolique IDE (find refs, rename, refactoring LSP) | `uv tool install -p 3.13 serena-agent` |
+| [Ponytail](https://github.com/DietrichGebert/ponytail) | Règle Cursor — YAGNI ladder, code minimal et efficace | Intégré (aucune installation) |
+
+### Prérequis machine (une seule fois)
 
 ```bash
-# Python 3.10+ requis
+# Context Mode — serveur MCP de gestion de contexte
+npm install -g context-mode
+
+# Headroom — compression de contexte (Python 3.10+ requis)
 pip install "headroom-ai[mcp]"
+
+# Serena — navigation symbolique IDE (uv requis : https://docs.astral.sh/uv/getting-started/installation/)
+uv tool install -p 3.13 serena-agent
 ```
 
-**Vérifier que Cursor détecte le serveur :**
+### Vérification
 
 ```bash
+# Vérifier Context Mode
+context-mode doctor
+
+# Vérifier Headroom
 headroom mcp status
+
+# Vérifier Serena
+serena --version
 ```
 
-Une fois installé, les agents Cursor travaillant sur ce projet ont automatiquement accès aux outils `headroom_compress`, `headroom_retrieve` et `headroom_stats`.
+Dans Cursor, ouvre **Settings → MCP** et confirme que `context-mode`, `headroom` et `serena` sont connectés.
+
+### Règles Cursor actives
+
+Le dossier `.cursor/rules/` contient un ensemble de règles adaptées au développement avec Claude Sonnet :
+
+| Fichier | Scope | Description |
+|---------|-------|-------------|
+| `00-general.mdc` | Toujours actif | Analyse avant d'agir, intervention minimale, respect des conventions |
+| `01-code-quality.mdc` | `*.ts`, `*.tsx` | TypeScript strict, BiomeJS, pas de commentaires triviaux |
+| `02-architecture.mdc` | Toujours actif | Server Components, App Router, structure des dossiers |
+| `03-git-workflow.mdc` | `.git*` | Commits atomiques, messages clairs, branches |
+| `04-security.mdc` | `*.ts`, `*.tsx` | Secrets, validation des entrées, headers HTTP |
+| `05-documentation.mdc` | `*.ts`, `*.md` | Quoi et comment documenter |
+| `06-docker.mdc` | `Dockerfile*`, `compose*` | Multi-stage builds, sécurité, Compose |
+| `context-mode.mdc` | Toujours actif | Routing MCP — protège la fenêtre de contexte |
+| `ponytail.mdc` | Toujours actif | YAGNI ladder — génère le minimum de code qui fonctionne |
+| `project-stack.mdc` | Toujours actif | Stack technique et règles absolues du projet |
+| `nextjs-app-router.mdc` | `app/**` | Conventions App Router, data fetching, metadata |
+| `tailwind.mdc` | `*.tsx`, `*.css` | Tailwind v4 sans fichier de config |
+| `typescript-react.mdc` | `*.ts`, `*.tsx` | Fonctions nommées, gestion d'erreurs, conventions de nommage |
+
+### Mémoire projet IA
+
+Le dossier `.ai/` contient la mémoire persistante du projet pour les agents :
+
+```
+.ai/
+├── README.md            # Guide d'utilisation
+├── project-context.md   # Objectif, stack, architecture, contraintes
+└── decisions.md         # Journal des décisions d'architecture
+```
+
+Mets à jour ces fichiers au fil du projet pour que les agents comprennent le contexte sans longues explications en début de session.
+
+### Comment utiliser avec Cursor
+
+1. Cloner le boilerplate et installer les dépendances (`npm install`)
+2. Installer les prérequis machine (`context-mode`, `headroom`, `serena`)
+3. Ouvrir le projet dans Cursor — les règles et MCP sont activés automatiquement
+4. Remplir `.ai/project-context.md` avec le contexte de ton projet
+5. L'agent lit automatiquement les règles `.cursor/rules/` et la mémoire `.ai/` à chaque session
 
 ## Licence
 
